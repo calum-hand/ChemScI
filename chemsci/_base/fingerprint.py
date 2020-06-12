@@ -100,7 +100,7 @@ class FingerprintFactory:
         return mol
 
     def mol_to_fingerprint(self, mol):
-        """Calculates and returns the fingerprint of a singular mol object.
+        """Calculates and returns the fingerprint of a singular mol object as a numpy array.
 
         Notes
         -----
@@ -108,7 +108,8 @@ class FingerprintFactory:
 
             mol_to_fingerprint(mol) --> fingerprint (np.array)
 
-        The returned object must have each bit / vector element represented as a single element in a numpy array.
+        The returned numpy array **must** be a row vector if the fingerprint is 1D where each element is a specific bit.
+        If the fingerprint is multi-dimensional then the `n`D vector can be returned without constraint.
         """
         return NotImplemented
 
@@ -161,7 +162,6 @@ class FingerprintFactory:
             try:
                 fp = self.mol_to_fingerprint(mol)
                 assert isinstance(fp, np.ndarray), 'Fingerprint must be generated as a 1D or `n`D numpy array.'
-                # TODO : Check if row or column vector!!!
                 self._fingerprints.append(fp)
                 self._fingerprint_representations.append(rep)
             except:
