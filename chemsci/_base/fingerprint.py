@@ -330,23 +330,48 @@ class FingerprintFactory:
                                                      'Ensure all fingerprints are equal length for all molecules.')
         return product
 
-    def produce_series(self, name='Fingerprint'):
-        """Returns a pandas Series of molecular fingerprints where each entry is the entire fingerprint
-         represented as a string.
+    def produce_series(self, series_name='Fingerprint'):
+        """Returns a pandas Series of molecular fingerprints where each element is a bit string representation
+        of the molecular fingerprint.
+        Therefore `produce_series` can only be called for fingerprints which can be represented as a bit string i.e.:
+        ExtConFingerprintFF etc.
+        The index of the produced series will be string versions of the molecular representations used to generate the
+        fingerprints.
+
+        >>> FingerprintFactory.produce_series(series_name='Example')
+        'smiles_0'  '11001',
+         ...        ...
+         'smiles_n' '10001'
+         Name: 'Example, dtype:object
 
         Parameters
         ----------
-        name : str (default = 'Fingerprint')
+        series_name : str (default = 'Fingerprint')
             Name to be given to the pandas Series object.
+
+        Raises
+        ------
+        BitVectorRepresentationError
+            If a fingerprint canot be converted into a bit string / vector.
+
+        UserWarning
+            If `series_name` cannot be accepted as a series name due to being non hashable type.
+            Default value of `series_name` will be used if this is the case.
 
         Returns
         -------
         product : pd.Series, shape(num_fingerprints)
-            Pandas Series object containing string representations of calculated fingerprints.
-            Indexed by representations.
+            Pandas Series object containing string representations of obtained fingerprints.
+            Series is indexed by string molecular representations.
         """
-        data = self.produce_list(as_strings=True)
-        product = pd.Series(name=name, data=data, index=self._fingerprint_representations)
+        data = self.produce_list(as_bit_string=True)
+        representations = [str(rep) for rep in self._fingerprint_representations]
+        product = pd.Series(data=data, index=representations)
+        try:
+            product.name = series_name
+        except TypeError:
+            product.name = 'Fingerprint'
+            warn('Unable to name series `series_name` as must be hashable type. Defaulting to "Fingerprint".')
         return product
 
     def produce_dataframe(self):
