@@ -1,3 +1,5 @@
+import numpy as np
+
 from pubchempy import Compound
 from rdkit.Chem import MACCSkeys
 from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
@@ -16,8 +18,8 @@ class MolAccessFF(FingerprintFactory):
     def mol_to_fingerprint(self, mol):
         fp = MACCSkeys.GenMACCSKeys(mol)
         fp_bit = fp.ToBitString()
-        cleaned_fp = list(fp_bit)[1:]
-        return cleaned_fp
+        fp_arr = np.array(list(fp_bit))[1:]
+        return fp_arr
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -33,8 +35,8 @@ class DaylightFF(FingerprintFactory):
     def mol_to_fingerprint(self, mol):
         fp = RDKFingerprint(mol, fpSize=self.nbits, minPath=self.min_path, maxPath=self.max_path)
         fp_bit = fp.ToBitString()
-        cleaned_fp = list(fp_bit)
-        return cleaned_fp
+        fp_arr = np.array(list(fp_bit))[1:]
+        return fp_arr
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -53,8 +55,8 @@ class ExtConFingerprintFF(FingerprintFactory):
     def mol_to_fingerprint(self, mol):
         fp = GetMorganFingerprintAsBitVect(mol, radius=self._radius, nBits=self.nbits, useFeatures=self._features)
         fp_bit = fp.ToBitString()
-        cleaned_fp = list(fp_bit)
-        return cleaned_fp
+        fp_arr = np.array(list(fp_bit))
+        return fp_arr
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -79,5 +81,5 @@ class PubChemFF(FingerprintFactory):
 
     def mol_to_fingerprint(self, mol):
         fp_bit = mol.cactvs_fingerprint
-        cleaned_fp = list(fp_bit)
-        return cleaned_fp
+        fp_arr = np.array(list(fp_bit))
+        return fp_arr
