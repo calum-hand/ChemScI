@@ -7,6 +7,7 @@ import numpy as np
 from rdkit import Chem
 
 from chemsci._base.exceptions import (BitVectorRepresentationError,
+                                      FingerprintRepresentationError,
                                       JsonSerialisationError)
 
 # TODO : Need to sort out if the `mol_to_fingerprint` should produce strings OR numbers (makes more sense for `produce` fnctons to output numbers than strings but conversion gets iffy
@@ -283,24 +284,50 @@ class FingerprintFactory:
             raise JsonSerialisationError('Unable to serialise representation and fingerprint data to JSON format.')
         return product
 
-    def produce_array(self, as_type=str):
-        """Returns a numpy array of molecule fingerprints of type `str`.
-        Equivalent to running:
+    def produce_array(self, as_bit_string=False, as_type=str):
+        """Returns a numpy array of molecule fingerprints, the type of which can be specified if
+        `as_bit_string=False`.
 
-        >>> product = FingerprintFactory.produce_list(as_strings=False)
-        >>> product_arr = np.array(product).astype(str)
+        >>> FingerprintFactory.produce_array(as_bit_string=False, as_type=int)
+        array([[1, 1, 0, 0, 1],
+               ...,
+               [1, 0, 0, 0, 1]])
+
+        >>> FingerprintFactory.produce_array(as_bit_string=True)
+        array(['11001',
+               ...,
+               '10001'])
 
         Parameters
         ----------
+        as_bit_string : bool (default = False)
+            Whether fingerprints should be returned as bit strings or not.
+
         as_type : numpy array type {str, int, float} (default = str)
             Data type which the contents of each numpy array should be returned as.
+
+        Raises
+        ------
+        BitVectorRepresentationError
+            If a fingerprint canot be converted into a bit string / vector.
+
+        FingerprintRepresentationError
+            If unable to convert the output array to the desired type.
+            Typically would occur when all obtained fingerprints are not the same length.
 
         Returns
         -------
         product : np.array, shape(num_fingerprints, fingerprint_length)
             Numpy array of fingerprints where each row is a fingerprint and each column is a specific bit.
         """
-        product = np.array(self._fingerprints).astype(as_type)
+        fingerprints = self.produce_list(as_bit_string=as_bit_string)
+        product = np.array(fingerprints)
+        if not as_bit_string:
+            try:
+                product = product.astype(as_type)
+            except ValueError:
+                raise FingerprintRepresentationError('Unable to convert fingerprint to specified type. '
+                                                     'Ensure all fingerprints are equal length for all molecules.')
         return product
 
     def produce_series(self, name='Fingerprint'):

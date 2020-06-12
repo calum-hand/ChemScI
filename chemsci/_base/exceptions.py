@@ -5,6 +5,13 @@ class BitVectorRepresentationError(Exception):
     pass
 
 
+class FingerprintRepresentationError(Exception):
+    """Named Exception raised when fingerprints are unable to be interacted with due to incorrect types or mismatched
+    numpy array sizes.
+    """
+    pass
+
+
 class JsonSerialisationError(Exception):
     """Named Exception raised if FingerprintFactory is unable to correctly serialise data into JSON format.
     """
