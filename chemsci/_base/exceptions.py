@@ -5,13 +5,7 @@ class BitVectorRepresentationError(Exception):
     pass
 
 
-class FingerprintRepresentationError(Exception):
-    """
-    """
-    pass
-
-
 class JsonSerialisationError(Exception):
-    """
+    """Named Exception raised if FingerprintFactory is unable to correctly serialise data into JSON format.
     """
     pass
