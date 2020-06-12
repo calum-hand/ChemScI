@@ -6,17 +6,14 @@ import numpy as np
 
 from rdkit import Chem
 
-from chemsci._base.exceptions import (BitVectorRepresentationError,
-                                      FingerprintRepresentationError,
-                                      JsonSerialisationError)
-
-# TODO : Need to sort out if the `mol_to_fingerprint` should produce strings OR numbers (makes more sense for `produce` fnctons to output numbers than strings but conversion gets iffy
-# TODO : Once set up and running for basic fingerprints, need to see about how to get running for matrix fingerprints etc
+from chemsci._exceptions import (BitVectorRepresentationError,
+                                 FingerprintRepresentationError,
+                                 JsonSerialisationError)
 
 
 class FingerprintFactory:
     """Parent class used to calculate various molecular fingerprints and return them to the user in a variety of ways.
-    Expects molecular fingerprints to be equal length regardless of molecule.
+    Expects all molecular fingerprints of the same type to be equal dimensions regardless of molecule.
 
     Attributes
     ----------
@@ -164,6 +161,7 @@ class FingerprintFactory:
             try:
                 fp = self.mol_to_fingerprint(mol)
                 assert isinstance(fp, np.ndarray), 'Fingerprint must be generated as a 1D or `n`D numpy array.'
+                # TODO : Check if row or column vector!!!
                 self._fingerprints.append(fp)
                 self._fingerprint_representations.append(rep)
             except:
@@ -330,62 +328,96 @@ class FingerprintFactory:
                                                      'Ensure all fingerprints are equal length for all molecules.')
         return product
 
-    def produce_series(self, series_name='Fingerprint'):
-        """Returns a pandas Series of molecular fingerprints where each element is a bit string representation
-        of the molecular fingerprint.
-        Therefore `produce_series` can only be called for fingerprints which can be represented as a bit string i.e.:
-        ExtConFingerprintFF etc.
-        The index of the produced series will be string versions of the molecular representations used to generate the
-        fingerprints.
+    def produce_series(self, as_bit_string=False, as_type=str):
+        """Returns a pandas Series of molecular fingerprints indexed against the correpsonding representation (as str)
+        where each element is either a bit string or a `n` dimensional numpy array.
+        The ability to store multi-dimensional numpy arrays as entries enables fingerprint representations such as 2D
+        correlation matrices or other user implemented fingerprints.
 
-        >>> FingerprintFactory.produce_series(series_name='Example')
+        >>> FingerprintFactory.produce_series(as_bit_string=False, as_type=int)
+        'smiles_0'  [1, 1, 0, 0, 1],
+         ...        ...
+         'smiles_n' [1, 0, 0, 0, 1]
+         dtype: object
+
+         >>> FingerprintFactory.produce_series(as_bit_string=True)
         'smiles_0'  '11001',
          ...        ...
          'smiles_n' '10001'
-         Name: 'Example, dtype:object
+         dtype: object
 
         Parameters
         ----------
-        series_name : str (default = 'Fingerprint')
-            Name to be given to the pandas Series object.
+        as_bit_string : bool (default = False)
+            Whether fingerprints should be returned as bit strings or not.
+
+        as_type : numpy array type {str, int, float} (default = str)
+            Data type which each numpy array element in the series should be returned as.
 
         Raises
         ------
         BitVectorRepresentationError
             If a fingerprint canot be converted into a bit string / vector.
 
-        UserWarning
-            If `series_name` cannot be accepted as a series name due to being non hashable type.
-            Default value of `series_name` will be used if this is the case.
+        FingerprintRepresentationError
+            If unable to convert the output array to the desired type.
+            Typically would occur when all obtained fingerprints are not the same length.
 
         Returns
         -------
         product : pd.Series, shape(num_fingerprints)
-            Pandas Series object containing string representations of obtained fingerprints.
+            Pandas Series object containing either obtained fingerprints as either bit strings or numpy arrays.
             Series is indexed by string molecular representations.
         """
-        data = self.produce_list(as_bit_string=True)
+        data = list(self.produce_array(as_bit_string=as_bit_string, as_type=as_type))
         representations = [str(rep) for rep in self._fingerprint_representations]
         product = pd.Series(data=data, index=representations)
-        try:
-            product.name = series_name
-        except TypeError:
-            product.name = 'Fingerprint'
-            warn('Unable to name series `series_name` as must be hashable type. Defaulting to "Fingerprint".')
         return product
 
-    def produce_dataframe(self):
+    def produce_dataframe(self, as_type=str):
         """Returns a pandas DataFrame of molecule fingerprints, indexed by the representations.
         Column headers are integer indices of each character / bit in the fingerprint, indexed from 0.
+        Dataframes of fingerprints can only be returned when fingerprints obtained are each 1D vectors.
+        If fingerprints are expected to be 2D or greater, consider calling `produce_series` or `produce_array`
+        instead.
+
+        >>> FingerprintFactory.produce_dataframe(as_type=int)
+                        0   1   2   3   4
+        'smiles_0'      1   1   0   0   1
+        ...             ...
+        'smiles_n'      1   0   0   0   1
+        [n rows x 5 columns]
+
+        Parameters
+        ----------
+        as_type : numpy array type {str, int, float} (default = str)
+            Data type which each numpy array element in the series should be returned as.
+
+        Raises
+        ------
+        BitVectorRepresentationError
+            If a fingerprint canot be converted into a bit string / vector.
+
+        FingerprintRepresentationError
+            If unable to convert the output array to the desired type.
+            Typically would occur when all obtained fingerprints are not the same length.
+            Can also be raised if fingerprints are unable to be represented in 2D pandas DataFrame.
 
         Returns
         -------
         product : pd.DataFrame, shape(num_fingerprints, fingerprint_length)
-            Pandas DataFrame with each row as a singular molecule, indexed with the representation.
+            Pandas DataFrame with each row as a singular fingerprint and each column as a singular bit / element
+            of the bit vector.
+            The datarame is indexed with the representation of each molecule.
         """
         columns = [i for i in range(self.nbits)]
-        data = self.produce_list(as_strings=False)
-        product = pd.DataFrame(data=data, columns=columns, index=self._fingerprint_representations)
+        representations = [str(rep) for rep in self._fingerprint_representations]
+        data = self.produce_array(as_type=as_type)
+        try:
+            product = pd.DataFrame(data=data, columns=columns, index=representations)
+        except ValueError:
+            raise FingerprintRepresentationError('ingerprints must be 1D vectors to convert to dataframe. '
+                                                 'Call `produce_series` if fingerprints are `n` dimensional vectors.')
         return product
 
     def get_mols(self):
