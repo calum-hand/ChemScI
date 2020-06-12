@@ -35,7 +35,7 @@ class DaylightFF(FingerprintFactory):
     def mol_to_fingerprint(self, mol):
         fp = RDKFingerprint(mol, fpSize=self.nbits, minPath=self.min_path, maxPath=self.max_path)
         fp_bit = fp.ToBitString()
-        fp_arr = np.array(list(fp_bit))[1:]
+        fp_arr = np.array(list(fp_bit))
         return fp_arr
 
 
