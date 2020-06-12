@@ -1,7 +1,7 @@
 import pandas as pd
 from chemsci.fingerprints import MolAccessFF,  DaylightFF, ExtConFingerprintFF, FunctConFingerprintFF
 
-df = pd.read_csv('data/example.csv')
+df = pd.read_csv('data/molecules.csv')
 smiles = df['smiles']
 
 macc_ff = MolAccessFF()
