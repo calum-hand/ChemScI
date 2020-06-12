@@ -1,11 +1,9 @@
-import time
-
 from pubchempy import Compound
 from rdkit.Chem import MACCSkeys
 from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
 from rdkit.Chem.rdmolops import RDKFingerprint
 
-from _base.fingerprint import FingerprintFactory
+from chemsci._base.fingerprint import FingerprintFactory
 
 # ----------------------------------------------------------------------------------------------------------------------
 
