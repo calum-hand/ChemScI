@@ -3,3 +3,15 @@ class BitVectorRepresentationError(Exception):
     to a string.
     """
     pass
+
+
+class FingerprintRepresentationError(Exception):
+    """
+    """
+    pass
+
+
+class JsonSerialisationError(Exception):
+    """
+    """
+    pass

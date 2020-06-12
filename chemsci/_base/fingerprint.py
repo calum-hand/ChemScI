@@ -6,7 +6,9 @@ import numpy as np
 
 from rdkit import Chem
 
-from chemsci._base.exceptions import BitVectorRepresentationError
+from chemsci._base.exceptions import (BitVectorRepresentationError,
+                                      FingerprintRepresentationError,
+                                      JsonSerialisationError)
 
 # TODO : Need to sort out if the `mol_to_fingerprint` should produce strings OR numbers (makes more sense for `produce` fnctons to output numbers than strings but conversion gets iffy
 # TODO : Once set up and running for basic fingerprints, need to see about how to get running for matrix fingerprints etc
@@ -155,6 +157,7 @@ class FingerprintFactory:
         for rep, mol in zip(self._representations, self._mols):
             try:
                 fp = self.mol_to_fingerprint(mol)
+                # TODO : Add assertion to check if numpy array here or not.
                 self._fingerprints.append(fp)
                 self._fingerprint_representations.append(rep)
             except:
@@ -233,20 +236,46 @@ class FingerprintFactory:
         product = {str(k): v for k, v in zip(self._fingerprint_representations, fingerprints)}
         return product
 
-    def produce_json(self):
+    def produce_json(self, as_bit_string=False):
         """Returns a JSON string of molecule representations and corresponding fingerprints.
-        Equivalent to running:
+        By default (`as_bit_string=False`), fingerprints are converted from their numpy arrays to nested lists
+        for serialisation to JSON (multi dimensional fingerprints are supported).
+        Otherwise the bit string fingerprints are serialised (if possible).
 
-        >>> product = FingerprintFactory.produce_dict()
-        >>> json_product = json.dumps(product)
+        >>> FingerprintFactory.produce_json(as_bit_string=False)
+        '{"smiles_0": ["1", "1", "0", "0", "1"], ..., "smiles_n": ["1", "0", "0", "0", "1"]}'
+
+        >>> FingerprintFactory.produce_json(as_bit_string=True)
+        '{"smiles_0": "11001", ..., "smiles_n": "10001"}'
+
+        Parameters
+        ----------
+        as_bit_string : bool (default = False)
+            Whether fingerprints should be returned as bit strings or not.
+
+        Raises
+        ------
+        BitVectorRepresentationError
+            If a fingerprint canot be converted into a bit string / vector.
+
+        JsonSerialisationError
+            If unable to serialise the representation and fingerprints to JSON string.
 
         Returns
         -------
-        product : dict, {representation: fingerprint}, {str: list[str]}
-            Dictionary of molecular representations and corresponding fingerprint.
+        product : str, {representation: fingerprint}, {str: list[str]} OR {str: str}
+            JSON string of molecular representations and corresponding fingerprint.
+            Fingerprint can either be a serialised nested list or string.
         """
-        fp_dict = self.produce_dict()
-        product = json.dumps(fp_dict)
+        fp_dict = self.produce_dict(as_bit_string=as_bit_string)
+        if not as_bit_string:
+            to_serialise = {k: fp_dict[k].tolist() for k in fp_dict}  # convert np arrays to list for serialisation
+        else:
+            to_serialise = fp_dict
+        try:
+            product = json.dumps(to_serialise)
+        except TypeError:
+            raise JsonSerialisationError('Unable to serialise representation and fingerprint data to JSON format.')
         return product
 
     def produce_array(self, as_type=str):
