@@ -1,0 +1,4 @@
+pandas~=1.0.3
+numpy~=1.18.1
+rdkit~=2020.03.1.0
+pubchempy~=1.0.4
