@@ -7,7 +7,6 @@ import numpy as np
 from rdkit import Chem
 
 from chemsci._base.exceptions import (BitVectorRepresentationError,
-                                      FingerprintRepresentationError,
                                       JsonSerialisationError)
 
 # TODO : Need to sort out if the `mol_to_fingerprint` should produce strings OR numbers (makes more sense for `produce` fnctons to output numbers than strings but conversion gets iffy
@@ -146,8 +145,14 @@ class FingerprintFactory:
         self._representations, self._mols = valid_compunds, valid_mols
 
     def obtain_fingerprints(self):
-        """User function to calculate the fingerprints for all mol objects.
-        Calculation occurs iteratively for each mol via the `mol_to_fingerprint` method.
+        """User method to obtain the fingerprints for all previously generated mol objects.
+        Each fingerprint is obtained iteratively via the `mol_to_fingerprint` which is implementation specific.
+        Generated fingerprints must be a numpy array.
+
+        Raises
+        ------
+        AssertionError
+            Raised if produced fingerprint is not a numpy array.
 
         Returns
         -------
@@ -157,7 +162,7 @@ class FingerprintFactory:
         for rep, mol in zip(self._representations, self._mols):
             try:
                 fp = self.mol_to_fingerprint(mol)
-                # TODO : Add assertion to check if numpy array here or not.
+                assert isinstance(fp, np.ndarray), 'Fingerprint must be generated as a 1D or `n`D numpy array.'
                 self._fingerprints.append(fp)
                 self._fingerprint_representations.append(rep)
             except:
