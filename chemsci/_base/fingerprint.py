@@ -140,6 +140,7 @@ class FingerprintFactory:
                 valid_compunds.append(compound)
             except:
                 warn(F'Unable to convert {compound}')
+                # bare exception used as user defined converters could invoke errors not previously considered.
 
         self._representations, self._mols = valid_compunds, valid_mols
 
@@ -410,11 +411,10 @@ class FingerprintFactory:
             of the bit vector.
             The datarame is indexed with the representation of each molecule.
         """
-        columns = [i for i in range(self.nbits)]
         representations = [str(rep) for rep in self._fingerprint_representations]
         data = self.produce_array(as_type=as_type)
         try:
-            product = pd.DataFrame(data=data, columns=columns, index=representations)
+            product = pd.DataFrame(data=data, index=representations)
         except ValueError:
             raise FingerprintRepresentationError('ingerprints must be 1D vectors to convert to dataframe. '
                                                  'Call `produce_series` if fingerprints are `n` dimensional vectors.')
