@@ -4,6 +4,7 @@ from pubchempy import Compound
 from rdkit.Chem import MACCSkeys
 from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
 from rdkit.Chem.rdmolops import RDKFingerprint
+from rdkit.Avalon.pyAvalonTools import GetAvalonFP
 
 from chemsci._base.fingerprint import FingerprintFactory
 
@@ -12,6 +13,16 @@ from chemsci._base.fingerprint import FingerprintFactory
 
 class MolAccessFF(FingerprintFactory):
     def __init__(self):
+        """Fingerprint Factory for obtaining Molecular Access Fingerprints (MACCS).
+        Implementation uses `rdkit.Chem.MACCSkeys.GenMACCSKeys` to obtain fingerprint.
+        Inherets from `FingerprintFactory.
+
+        Attributes
+        ----------
+        nbits : int (default = 166)
+            Number of bits present in the MACCS fingerprint.
+            Ths number is the standard value for MACCS fingerprints and should not be altered.
+        """
         super().__init__()
         self.nbits = 166
 
@@ -21,6 +32,20 @@ class MolAccessFF(FingerprintFactory):
         fp_arr = np.array(list(fp_bit))[1:]
         return fp_arr
 
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+class Avalon_FF(FingerprintFactory):
+
+    def __init__(self):
+        super().__init__()
+        self.nbits = 512
+
+    def mol_to_fingerprint(self, mol):
+        fp = GetAvalonFP(mol)
+        fp_bit = fp.ToBitString()
+        fp_arr = np.array(list(fp_bit))
+        return fp_arr
 
 # ----------------------------------------------------------------------------------------------------------------------
 
