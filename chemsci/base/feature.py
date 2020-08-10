@@ -3,6 +3,10 @@ from abc import ABC, abstractmethod
 from sklearn.base import TransformerMixin
 from rdkit.Chem import MolFromSmiles, MolFromInchi, MolFromSmarts
 
+from chemsci.base.exceptions import StandardRepresentationError
+
+# ----------------------------------------------------------------------------------------------------------------------
+
 
 class Feature(ABC):
     """Lays out requirements for a feature:
@@ -47,6 +51,9 @@ class Feature(ABC):
         return NotImplemented
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+
+
 class CustomFeatureTransformer(Feature, TransformerMixin):
     """Allows for interface with `sklearn` objects through definition of `fit` and `transform` methods.
     """
@@ -60,6 +67,9 @@ class CustomFeatureTransformer(Feature, TransformerMixin):
             feature = self.generate_feature(mol)
             features.append(feature)
         return features
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 
 class StandardFeatureTransformer(CustomFeatureTransformer):
@@ -78,8 +88,10 @@ class StandardFeatureTransformer(CustomFeatureTransformer):
         try:
             self.rep_converter = self.converters[representation.lower()]
         except KeyError:
-            raise KeyError(F'Specified representation {representation} not in {self.converters.keys()}')
+            raise StandardRepresentationError(F'Representation {representation} not in {self.converters.keys()}')
 
     def convert_representation(self, representation):
         mol = self.rep_converter(representation)
         return mol
+
+# ----------------------------------------------------------------------------------------------------------------------
