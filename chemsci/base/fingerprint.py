@@ -6,9 +6,9 @@ import numpy as np
 
 from rdkit import Chem
 
-from chemsci._exceptions import (BitVectorRepresentationError,
-                                 FingerprintRepresentationError,
-                                 JsonSerialisationError)
+from chemsci.base.exceptions import (BitVectorRepresentationError,
+                                     FingerprintRepresentationError,
+                                     JsonSerialisationError)
 
 
 class FingerprintFactory:
