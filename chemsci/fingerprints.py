@@ -17,6 +17,10 @@ class MolAccessFF(FingerprintFactory):
         Implementation uses `rdkit.Chem.MACCSkeys.GenMACCSKeys` to obtain fingerprint.
         Inherets from `FingerprintFactory.
 
+        Notes
+        -----
+        As the `rdkit` implementation of `GenMACCSKeys` generates a 167 bit vector, here the
+
         Attributes
         ----------
         nbits : int (default = 166)
@@ -27,21 +31,56 @@ class MolAccessFF(FingerprintFactory):
         self.nbits = 166
 
     def mol_to_fingerprint(self, mol):
+        """Generates the Molecular Access Fingerprints (MACCS) for a passed 'rdkit.Chem.rdchem.Mol' object.
+        As the `rdkit` implemented algorithm produces a 167 bit vector, here the returned vector does not include
+        the bit value at index `0` as this is a "dead" bit.
+
+        Parameters
+        ----------
+        mol : rdkit.Chem.rdchem.Mol
+            `rdkit` mol object.
+
+        Returns
+        -------
+        fp_arr : np.ndarray, shape(166,)
+            Fingerprint expressed as a numpy row vector.
+        """
         fp = MACCSkeys.GenMACCSKeys(mol)
         fp_bit = fp.ToBitString()
-        fp_arr = np.array(list(fp_bit))[1:]
+        fp_arr = np.array(list(fp_bit))[1:]  # index to remove dead bit
         return fp_arr
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class Avalon_FF(FingerprintFactory):
+class AvalonFF(FingerprintFactory):
+    """Fingerprint Factory for obtaining Avalon Fingerprints.
+    Implementation uses `rdkit.Avalon.pyAvalonTools.GetAvalonFP` to obtain fingerprint.
+    Inherets from `FingerprintFactory.
 
+    Attributes
+    ----------
+    nbits : int (default = 512)
+        Number of bits present in the Avalon fingerprint.
+        Ths number is the standard value for Avalon fingerprints and should not be altered.
+    """
     def __init__(self):
         super().__init__()
         self.nbits = 512
 
     def mol_to_fingerprint(self, mol):
+        """Generates the Avalon fingerprint for a passed 'rdkit.Chem.rdchem.Mol' object.
+
+        Parameters
+        ----------
+        mol : rdkit.Chem.rdchem.Mol
+            `rdkit` mol object.
+
+        Returns
+        -------
+        fp_arr : np.ndarray, shape(512,)
+            Fingerprint expressed as a numpy row vector.
+        """
         fp = GetAvalonFP(mol)
         fp_bit = fp.ToBitString()
         fp_arr = np.array(list(fp_bit))
