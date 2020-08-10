@@ -6,7 +6,7 @@ from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
 from rdkit.Chem.rdmolops import RDKFingerprint
 from rdkit.Avalon.pyAvalonTools import GetAvalonFP
 
-from chemsci._base.fingerprint import FingerprintFactory
+from chemsci.base.fingerprint import FingerprintFactory
 
 # ----------------------------------------------------------------------------------------------------------------------
 
