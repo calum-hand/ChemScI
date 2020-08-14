@@ -122,7 +122,7 @@ class PubChem(CustomFeatureTransformer):
     def convert_representation(self, representation):
         compound = Compound.from_cid(representation)  # calls PubChem API
         time.sleep(self.crawl_delay)
-        return NotImplemented
+        return compound
 
     def generate_feature(self, mol):
         fp_bit = mol.cactvs_fingerprint  # attribute for Compound object in `PubchemPy`
