@@ -116,10 +116,6 @@ class FCFP(ECFP):
 
 class PubChem(CustomFeatureTransformer):
 
-    representation_converter = Compound.from_cid
-    # TODO : Implement the crawl delay for `representation_to_mol` in this case
-    # TODO : Will have to overload `representation_to_mol` so can include crawl delay and allow multiprocessing.
-
     def __init__(self, crawl_delay=2):
         self.crawl_delay = crawl_delay
 
