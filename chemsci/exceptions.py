@@ -30,7 +30,7 @@ class UserSelectionError(Exception):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class ConversionError(Exception):
+class ConversionWarning(UserWarning):
     """Unable to convert the passed representation into a workable object for featurisation.
     """
     pass
@@ -38,7 +38,7 @@ class ConversionError(Exception):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class FeaturisationError(Exception):
+class FeaturisationWarning(UserWarning):
     """Unable to featureise the passed converted representation."""
     pass
 
