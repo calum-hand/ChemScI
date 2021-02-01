@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from pubchempy import Compound
@@ -6,39 +8,27 @@ from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
 from rdkit.Chem.rdmolops import RDKFingerprint
 from rdkit.Avalon.pyAvalonTools import GetAvalonFP
 
-from chemsci.base.fingerprint import FingerprintFactory
+from chemsci.base.feature import StandardFeatureTransformer, CustomFeatureTransformer
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class MolAccessFF(FingerprintFactory):
-    def __init__(self):
-        """Fingerprint Factory for obtaining Molecular Access Fingerprints (MACCS).
-        Implementation uses `rdkit.Chem.MACCSkeys.GenMACCSKeys` to obtain fingerprint.
-        Inherets from `FingerprintFactory.
-
-        Notes
-        -----
-        As the `rdkit` implementation of `GenMACCSKeys` generates a 167 bit vector, here the
-
-        Attributes
-        ----------
-        nbits : int (default = 166)
-            Number of bits present in the MACCS fingerprint.
-            Ths number is the standard value for MACCS fingerprints and should not be altered.
-        """
-        super().__init__()
-        self.nbits = 166
-
-    def mol_to_fingerprint(self, mol):
+class MolAccess(StandardFeatureTransformer):
+    """Fingerprint Factory for obtaining Molecular Access Fingerprints (MACCS).
+    Implementation uses `rdkit.Chem.MACCSkeys.GenMACCSKeys` to obtain fingerprint.
+    """
+    def generate_feature(self, mol):
         """Generates the Molecular Access Fingerprints (MACCS) for a passed 'rdkit.Chem.rdchem.Mol' object.
-        As the `rdkit` implemented algorithm produces a 167 bit vector, here the returned vector does not include
-        the bit value at index `0` as this is a "dead" bit.
 
         Parameters
         ----------
         mol : rdkit.Chem.rdchem.Mol
             `rdkit` mol object.
+
+        Notes
+        -----
+        As the `rdkit` implementation of `GenMACCSKeys` generates a 167 bit vector, here the dead bit at index 0
+        is removed to ensure the resulting fingerprint is the correct length
 
         Returns
         -------
@@ -53,22 +43,11 @@ class MolAccessFF(FingerprintFactory):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class AvalonFF(FingerprintFactory):
+class Avalon(StandardFeatureTransformer):
     """Fingerprint Factory for obtaining Avalon Fingerprints.
     Implementation uses `rdkit.Avalon.pyAvalonTools.GetAvalonFP` to obtain fingerprint.
-    Inherets from `FingerprintFactory.
-
-    Attributes
-    ----------
-    nbits : int (default = 512)
-        Number of bits present in the Avalon fingerprint.
-        Ths number is the standard value for Avalon fingerprints and should not be altered.
     """
-    def __init__(self):
-        super().__init__()
-        self.nbits = 512
-
-    def mol_to_fingerprint(self, mol):
+    def generate_feature(self, mol):
         """Generates the Avalon fingerprint for a passed 'rdkit.Chem.rdchem.Mol' object.
 
         Parameters
@@ -89,14 +68,17 @@ class AvalonFF(FingerprintFactory):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class DaylightFF(FingerprintFactory):
-    def __init__(self, nbits=2048, min_path=1, max_path=7):
-        super().__init__()
+class Daylight(StandardFeatureTransformer):
+    """
+    """
+
+    def __init__(self, representation, nbits=2048, min_path=1, max_path=7):
+        super().__init__(representation)
         self.nbits = nbits
         self.min_path = min_path
         self.max_path = max_path
 
-    def mol_to_fingerprint(self, mol):
+    def generate_feature(self, mol):
         fp = RDKFingerprint(mol, fpSize=self.nbits, minPath=self.min_path, maxPath=self.max_path)
         fp_bit = fp.ToBitString()
         fp_arr = np.array(list(fp_bit))
@@ -106,17 +88,17 @@ class DaylightFF(FingerprintFactory):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class ExtConFingerprintFF(FingerprintFactory):
+class ECFP(StandardFeatureTransformer):
 
     _features = False
 
-    def __init__(self, nbits=1024, diameter=4):
-        super().__init__()
+    def __init__(self, representation, nbits=1024, diameter=4):
+        super().__init__(representation)
         self.nbits = nbits
         self.diameter = diameter
         self._radius = self.diameter // 2
 
-    def mol_to_fingerprint(self, mol):
+    def generate_feature(self, mol):
         fp = GetMorganFingerprintAsBitVect(mol, radius=self._radius, nBits=self.nbits, useFeatures=self._features)
         fp_bit = fp.ToBitString()
         fp_arr = np.array(list(fp_bit))
@@ -126,24 +108,32 @@ class ExtConFingerprintFF(FingerprintFactory):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class FunctConFingerprintFF(ExtConFingerprintFF):
+class FCFP(ECFP):
     _features = True
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-class PubChemFF(FingerprintFactory):
+class PubChem(CustomFeatureTransformer):
+    valid_fingerprints = ['cactvs_fingerprint', 'fingerprint']
 
-    representation_converter = Compound.from_cid
-    # TODO : Implement the crawl delay for `representation_to_mol` in this case
-    # TODO : Will have to overload `representation_to_mol` so can include crawl delay and allow multiprocessing.
+    def __init__(self, crawl_delay=2, pub_fp='cactv_fingerprint'):
+        self.crawl_delay = float(crawl_delay)
+        assert pub_fp in self.valid_fingerprints, F'PubChem fingerprint must be either {self.valid_fingerprints[0]} ' \
+                                                  F'or {self.valid_fingerprints[1]}.'
+        self.pub_fp = pub_fp
 
-    def __init__(self, crawl_delay=2):
-        super().__init__()
-        self.nbits = 881
-        self._crawl_delay = crawl_delay
+    def convert_representation(self, representation):
+        compound = Compound.from_cid(representation)  # calls PubChem API
+        time.sleep(self.crawl_delay)
+        return compound
 
-    def mol_to_fingerprint(self, mol):
-        fp_bit = mol.cactvs_fingerprint
+    def generate_feature(self, mol):
+        if self.pub_fp == self.valid_fingerprints[0]:
+            fp_bit = mol.cactvs_fingerprint  # attribute for Compound object in `PubchemPy`
+        elif self.pub_fp == self.valid_fingerprints[1]:
+            fp_bit = mol.fingerprint
+        else:
+            raise AttributeError(F'Incorrect fingerprint specified. {self.pub_fp} not supported by PubChemPy API.')
         fp_arr = np.array(list(fp_bit))
         return fp_arr

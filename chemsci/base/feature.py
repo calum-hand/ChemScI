@@ -53,20 +53,35 @@ class Feature(ABC):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-
 class CustomFeatureTransformer(Feature, TransformerMixin):
     """Allows for interface with `sklearn` objects through definition of `fit` and `transform` methods.
     """
+    features = []
+    representations = []
+
     def fit(self, X, y=None):
         return self
 
     def transform(self, X):
-        features = []
+        features, representations = [], []
+
         for representation in X:
-            mol = self.convert_representation(representation)
-            feature = self.generate_feature(mol)
+            try:
+                mol = self.convert_representation(representation)
+            except:
+                raise Exception(F'Unable to convert representation {representation} to workable object.')
+            try:
+                feature = self.generate_feature(mol)
+            except:
+                raise Exception(F'Unable to generate feature for representation {representation} .')
+
             features.append(feature)
-        return features
+            representations.append(representation)
+
+        self.features = features
+        self.representations = representations
+
+        return self.features
 
 
 # ----------------------------------------------------------------------------------------------------------------------
