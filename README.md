@@ -20,6 +20,7 @@ Through providing a consistent API, it is hoped that newly developed featurisati
 2. Use pubchem to really demonstrate non hard coded example
 ### Development
 1. Get new conda env set up for the project
+2. Doccumentation!!!
 2. Get environment.yml set up rather than requirements.txt for full conda experience
 3. Get some tests written
 4. Get some CI up and running (somewhere free...)
