@@ -5,7 +5,7 @@ from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
 from rdkit.Chem.rdmolops import RDKFingerprint
 from rdkit.Avalon.pyAvalonTools import GetAvalonFP
 
-from chemsci.base.exceptions import UserSelectionError
+from chemsci.exceptions import UserSelectionError
 
 # ----------------------------------------------------------------------------------------------------------------------
 

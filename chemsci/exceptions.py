@@ -21,3 +21,9 @@ class JsonSerialisationError(Exception):
     """Named Exception raised if FingerprintFactory is unable to correctly serialise data into JSON format.
     """
     pass
+
+
+class UserSelectionError(Exception):
+    """Named Exception for when an invalid selection is made by the user.
+    """
+    pass
