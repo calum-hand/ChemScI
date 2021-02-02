@@ -1,12 +1,4 @@
-class BitVectorRepresentationError(Exception):
-    """Unable to convert the numpy array representation of molecular fingerprint to a string.
-    """
-    pass
-
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-class FingerprintRepresentationError(Exception):
+class FeatureRepresentationError(Exception):
     """Features are unable to be interacted with due to incorrect types or mismatched numpy array sizes.
     """
     pass
