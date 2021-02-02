@@ -90,6 +90,7 @@ class FeatureFactory(TransformerMixin):
         Raises
         ------
         FeaturisationWarning : If unable to create featurised representation of passed `mol` object.
+            An empty numpy array will be returned in this instance to allow the remaining code to still function.
 
         Returns
         -------
@@ -100,7 +101,7 @@ class FeatureFactory(TransformerMixin):
             feat = self.featuriser(mol)
         except:
             warnings.warn(F'Unable to create featurisation of molecular representation {mol}.', FeaturisationWarning)
-            feat = None
+            feat = np.array([])
         return feat
 
     def tranform(self, X):
