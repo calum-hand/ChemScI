@@ -1,5 +1,6 @@
 import time
 
+from rdkit import Chem
 from pubchempy import Compound
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -57,5 +58,16 @@ class pubchem_conv:
         compound = Compound.from_cid(representation)  # calls PubChem API
         time.sleep(self.crawl_delay)  # ensure good scraping practise
         return compound
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+_DEFAULT_CONVERTERs = {'smiles': Chem.MolFromSmiles,
+                       'smarts': Chem.MolFromSmarts,
+                       'inchi': Chem.MolFromInchi,
+                       'mol': Chem.MolFromMolFile,
+                       'pdb': Chem.MolFromPDBFile,
+                       'none': no_conversion_required,
+                       'pubchem': pubchem_conv}
 
 # ----------------------------------------------------------------------------------------------------------------------
