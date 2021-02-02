@@ -20,5 +20,3 @@ Through providing a consistent API, it is hoped that newly developed featurisati
 2. Use pubchem to really demonstrate non hard coded example
 ### Development
 3. Get some tests written
-4. Get some CI up and running (somewhere free...)
-5. Get a docker file in there for good measure! 
