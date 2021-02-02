@@ -62,7 +62,7 @@ class pubchem_conv:
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-_DEFAULT_CONVERTERs = {'smiles': Chem.MolFromSmiles,
+_DEFAULT_CONVERTERS = {'smiles': Chem.MolFromSmiles,
                        'smarts': Chem.MolFromSmarts,
                        'inchi': Chem.MolFromInchi,
                        'mol': Chem.MolFromMolFile,
