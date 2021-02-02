@@ -112,25 +112,18 @@ class daylight_fp:
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class morgan_ecfp:
+class morgan_fp:
 
-    _features = False
-
-    def __init__(self, nbits=1024, diameter=4):
-        self.nbits = nbits
-        self.diameter = diameter
+    def __init__(self, nbits=1024, diameter=4, use_features=False):
+        self.nbits = int(nbits)
+        self.diameter = int(diameter)
+        self.use_features = bool(use_features)
         self._radius = self.diameter // 2
 
     def __call__(self, mol):
-        fp = GetMorganFingerprintAsBitVect(mol, radius=self._radius, nBits=self.nbits, useFeatures=self._features)
+        fp = GetMorganFingerprintAsBitVect(mol, radius=self._radius, nBits=self.nbits, useFeatures=self.use_features)
         fp_arr = _rdkit_fp_to_np_arr(fp)
         return fp_arr
-
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-class morgan_fcfp(morgan_ecfp):
-    _features = True
 
 # ----------------------------------------------------------------------------------------------------------------------
 
