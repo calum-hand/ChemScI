@@ -149,3 +149,20 @@ class pubchem_fp:
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+
+_DEAFULT_FEATURISERS = {'maccs': maccs_fp,
+                        'avalon': avalon_fp,
+                        'daylight': daylight_fp(),
+                        'ecfp_4_1024': morgan_fp(nbits=1024, diameter=4),
+                        'ecfp_6_1024': morgan_fp(nbits=1024, diameter=6),
+                        'ecfp_4_2048': morgan_fp(nbits=2048, diameter=4),
+                        'ecfp_6_2048': morgan_fp(nbits=2048, diameter=6),
+                        'fcfp_4_1024': morgan_fp(nbits=1024, diameter=4, use_features=True),
+                        'fcfp_6_1024': morgan_fp(nbits=1024, diameter=6, use_features=True),
+                        'fcfp_4_2048': morgan_fp(nbits=2048, diameter=4, use_features=True),
+                        'fcfp_6_2048': morgan_fp(nbits=2048, diameter=6, use_features=True),
+                        'pubchem_cactvs': pubchem_fp(),
+                        'pubchem_fp': pubchem_fp(pub_fp='fingerprint')
+                        }
+
+# ----------------------------------------------------------------------------------------------------------------------
