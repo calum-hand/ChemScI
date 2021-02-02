@@ -1,4 +1,5 @@
 # ChemSci
+![Build Status](https://github.com/Bundaberg-Joey/ChemScI/workflows/ChemScI/badge.svg)
 
 ## Goals
 * Provide a consistent interface for the featurisation of molecules or other chemical systems for informatics studies
