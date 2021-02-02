@@ -78,32 +78,42 @@ def avalon_fp(mol):
 
 
 class daylight_fp:
-    """
-
+    """Generates the Daylight fingerprint for a passed `rdkit.Chem.rdchem.Mol' object using
+    `rdkit.Chem.rdmolops.RDKFingerprint`.
     """
 
     def __init__(self, nbits=2048, min_path=1, max_path=7):
         """
         Parameters
         ----------
-        nbits
-        min_path
-        max_path
+        nbits : int
+            (default = 2048)
+            Number of bits in the output fingerprint.
+
+        min_path : int
+            (default = 1)
+            Minimum number of bonds to include in subgraph calculation.
+
+        max_path: int
+            (default = 7)
+            Maximum number of bonds to include in subgraph calculation.
         """
-        self.nbits = nbits
-        self.min_path = min_path
-        self.max_path = max_path
+        self.nbits = int(nbits)
+        self.min_path = int(min_path)
+        self.max_path = int(max_path)
 
     def __call__(self, mol):
-        """
+        """Generates the Daylight fingerprint for passed `mol` object.
 
         Parameters
         ----------
-        mol
+        mol : rdkit.Chem.rdchem.Mol
+            Rdkit mol object.
 
         Returns
         -------
-
+        fp_arr : np.ndarray, shape(self.nbits, )
+            Fingerprint expressed as a numpy row vector.
         """
         fp = RDKFingerprint(mol, fpSize=self.nbits, minPath=self.min_path, maxPath=self.max_path)
         fp_arr = _rdkit_fp_to_np_arr(fp)
@@ -113,14 +123,46 @@ class daylight_fp:
 
 
 class morgan_fp:
+    """Generates variations of morgan based fingerprints (including `ECFP` and `FCFP`) for a passed
+    `rdkit.Chem.rdchem.Mol` object.
+
+    Uses `rdkit.Chem.AllChem.GetMorganFingerprintAsBitVect` to generate the fingerprints.
+    """
 
     def __init__(self, nbits=1024, diameter=4, use_features=False):
+        """
+        Parameters
+        ----------
+        nbits : int
+            (default = 1024)
+            Number  of bits in the output fingerprint.
+
+        diameter : int
+            (default = 4)
+            Number of bonds to include in circular fingerprint.
+
+        use_features : bool
+            (default = False)
+            Denotes if the ECFP (False) or FCFP (True) should be generated.
+        """
         self.nbits = int(nbits)
         self.diameter = int(diameter)
         self.use_features = bool(use_features)
         self._radius = self.diameter // 2
 
     def __call__(self, mol):
+        """Generates the Morgan fingerprint for passed `mol` object.
+
+        Parameters
+        ----------
+        mol : rdkit.Chem.rdchem.Mol
+            Rdkit mol object.
+
+        Returns
+        -------
+        fp_arr : np.ndarray, shape(self.nbits, )
+            Fingerprint expressed as a numpy row vector.
+        """
         fp = GetMorganFingerprintAsBitVect(mol, radius=self._radius, nBits=self.nbits, useFeatures=self.use_features)
         fp_arr = _rdkit_fp_to_np_arr(fp)
         return fp_arr
@@ -129,15 +171,37 @@ class morgan_fp:
 
 
 class pubchem_fp:
+    """Featuriser used to interact with generated `pubchempy.Compound` objects and retrieve relevant fingerprint records
+    / data.
+    """
     valid_fingerprints = ['cactvs_fingerprint', 'fingerprint']
 
     def __init__(self, pub_fp='cactv_fingerprint'):
+        """
+        Parameters
+        ----------
+        pub_fp : str
+            The specific PubChem fingerprint to be retrieved from the pubchempy.Compound object.
+            Can either be 'cactvs_fingerprint' OR 'fingerprint'.
+        """
         self.pub_fp = str(pub_fp).lower()
 
         if self.pub_fp not in self.valid_fingerprints:
             raise UserSelectionError(F'Passed {self.pub_fp} not in {self.valid_fingerprints}.')
 
     def __call__(self, mol):
+        """Retrieves the specified PubChem fingerprint for passed `mol` object.
+
+        Parameters
+        ----------
+        mol : pubchempy.Compound
+            PubChempy Compound object.
+
+        Returns
+        -------
+        fp_arr : np.ndarray, shape(self.nbits, )
+            Fingerprint expressed as a numpy row vector.
+        """
         if self.pub_fp == self.valid_fingerprints[0]:
             fp_bit = mol.cactvs_fingerprint  # attribute for Compound object in `PubchemPy`
         elif self.pub_fp == self.valid_fingerprints[1]:
