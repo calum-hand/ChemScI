@@ -2,8 +2,10 @@ import warnings
 
 from sklearn.base import TransformerMixin
 
+from chemsci.converters import _DEFAULT_CONVERTERS
+from chemsci.featurisers import _DEAFULT_FEATURISERS
 from chemsci.exceptions import ConversionWarning, FeaturisationWarning
-
+from chemsci.utils import determine_default_or_callable
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -16,17 +18,36 @@ class FeatureFactory(TransformerMixin):
         """
         Parameters
         ----------
-        converter : callable
-            Instantiaed callable object or function.
+        converter : str OR callable
             Used to convert a molecular representation into a workable object which can undergo featurisation.
+            Either default parameter in list or a custom callable object / function, will be used via `__call__`.
+                * `smiles`
+                * `smarts`
+                * `inchi`
+                * `mol` (path to file)
+                * `pdb` (path to file)
+                * 'pubchem' (CID number)
+                * `none` (when no conversion is required)
 
-        featuriser : callable
-            Instantiaed callable object or function.
+        featuriser : str OR callable
             Used to featurise a workable molecular object.
+            Either default parameter in list or a custom callable object / function, will be used via `__call__`.
+                * `maccs` (Molecular Access fingerprint)
+                * `avalon` (Avalon fingerprint)
+                * `daylight` (daylight fingerprint)
+                * `ecfp_4_1024` (1024 bit ECFP of radius 4)
+                * `ecfp_6_1024` (1024 bit ECFP of radius 4)
+                * `ecfp_4_2048` (1024 bit ECFP of radius 4)
+                * `ecfp_6_2048` (1024 bit ECFP of radius 4)
+                * `fcfp_4_1024` (1024 bit ECFP of radius 4)
+                * `fcfp_6_1024` (1024 bit ECFP of radius 4)
+                * `fcfp_4_2048` (1024 bit ECFP of radius 4)
+                * `fcfp_6_2048` (1024 bit ECFP of radius 4)
+                * `pubchem_cactvs` (Presence of 881 substructures from PubChem API)
+                * `pubchem_fp` (Encoded fingerpint from PubChem API)
         """
-        assert callable(converter) and callable(featuriser), 'Passed converter and featuriser should be callables'
-        self.converter = converter
-        self.featuriser = featuriser
+        self.converter = determine_default_or_callable(converter, _DEFAULT_CONVERTERS)
+        self.featuriser = determine_default_or_callable(featuriser, _DEAFULT_FEATURISERS)
         self.features = []
 
     def convert_rep(self, representation):
