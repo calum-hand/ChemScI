@@ -9,5 +9,5 @@ dependencies:
   - scikit-learn
   - pubchempy
   - rdkit
-prefix: /home/calum/anaconda3/envs/ChemScI
-
+  - pyyaml
+  - pytest
