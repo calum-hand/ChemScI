@@ -10,11 +10,13 @@ This prevents commonly used tools from being subtly hard-coded into the ChemSci 
 
 Through providing a consistent API, it is hoped that newly developed featurisations for cheminformatics can be readily incorporated and hence provide easy access to the informatics community.
 
+## Design Notes
+* Featurisers and converters are all written using `snake_case` covnention rather than `CamelCase` to reinforce their callable nature.  
+
 ## TODO
 ### Factory object
-1. Inherit from sklearn transformer mixin with appropriate methods
-2. representation and featurisation converters are passed as composition to main factory or callable objects
-3. Add more output file formats to the factory / roller whatever (i.e. YAML / SQLITE)
+2. Add more output file formats to the factory / roller whatever (i.e. YAML / SQLITE)
+3. Accept list of featurisers?
 ### Features
 1. Try and add a literature example as a demo for novel incorporation (if code + suitable license)
 2. Use pubchem to really demonstrate non hard coded example
