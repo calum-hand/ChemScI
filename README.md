@@ -18,7 +18,6 @@ Through providing a consistent API, it is hoped that newly developed featurisati
 1. Try and add a literature example as a demo for novel incorporation (if code + suitable license)
 2. Use pubchem to really demonstrate non hard coded example
 ### Development
-2. Get environment.yml set up rather than requirements.txt for full conda experience
 3. Get some tests written
 4. Get some CI up and running (somewhere free...)
 5. Get a docker file in there for good measure! 
