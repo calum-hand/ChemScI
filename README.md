@@ -14,15 +14,10 @@ Through providing a consistent API, it is hoped that newly developed featurisati
 * Featurisers and converters are all written using `snake_case` covnention rather than `CamelCase` to reinforce their callable nature.  
 
 ## TODO
-### Factory object
-2. Add more output file formats to the factory / roller whatever (i.e. YAML / SQLITE)
-3. Accept list of featurisers?
 ### Features
 1. Try and add a literature example as a demo for novel incorporation (if code + suitable license)
 2. Use pubchem to really demonstrate non hard coded example
 ### Development
-1. Get new conda env set up for the project
-2. Doccumentation!!!
 2. Get environment.yml set up rather than requirements.txt for full conda experience
 3. Get some tests written
 4. Get some CI up and running (somewhere free...)
