@@ -77,7 +77,7 @@ def avalon_fp(mol):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class daylight_fp:
+class DaylightFingerprint:
     """Generates the Daylight fingerprint for a passed `rdkit.Chem.rdchem.Mol' object using
     `rdkit.Chem.rdmolops.RDKFingerprint`.
     """
@@ -122,7 +122,7 @@ class daylight_fp:
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class morgan_fp:
+class MorganFingerprint:
     """Generates variations of morgan based fingerprints (including `ECFP` and `FCFP`) for a passed
     `rdkit.Chem.rdchem.Mol` object.
 
@@ -170,7 +170,7 @@ class morgan_fp:
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class pubchem_fp:
+class PubchemFingerprint:
     """Featuriser used to interact with generated `pubchempy.Compound` objects and retrieve relevant fingerprint records
     / data.
     """
@@ -216,17 +216,17 @@ class pubchem_fp:
 
 _DEAFULT_FEATURISERS = {'maccs': maccs_fp,
                         'avalon': avalon_fp,
-                        'daylight': daylight_fp(),
-                        'ecfp_4_1024': morgan_fp(nbits=1024, diameter=4),
-                        'ecfp_6_1024': morgan_fp(nbits=1024, diameter=6),
-                        'ecfp_4_2048': morgan_fp(nbits=2048, diameter=4),
-                        'ecfp_6_2048': morgan_fp(nbits=2048, diameter=6),
-                        'fcfp_4_1024': morgan_fp(nbits=1024, diameter=4, use_features=True),
-                        'fcfp_6_1024': morgan_fp(nbits=1024, diameter=6, use_features=True),
-                        'fcfp_4_2048': morgan_fp(nbits=2048, diameter=4, use_features=True),
-                        'fcfp_6_2048': morgan_fp(nbits=2048, diameter=6, use_features=True),
-                        'pubchem_cactvs': pubchem_fp(),
-                        'pubchem_fp': pubchem_fp(pub_fp='fingerprint')
+                        'daylight': DaylightFingerprint(),
+                        'ecfp_4_1024': MorganFingerprint(nbits=1024, diameter=4),
+                        'ecfp_6_1024': MorganFingerprint(nbits=1024, diameter=6),
+                        'ecfp_4_2048': MorganFingerprint(nbits=2048, diameter=4),
+                        'ecfp_6_2048': MorganFingerprint(nbits=2048, diameter=6),
+                        'fcfp_4_1024': MorganFingerprint(nbits=1024, diameter=4, use_features=True),
+                        'fcfp_6_1024': MorganFingerprint(nbits=1024, diameter=6, use_features=True),
+                        'fcfp_4_2048': MorganFingerprint(nbits=2048, diameter=4, use_features=True),
+                        'fcfp_6_2048': MorganFingerprint(nbits=2048, diameter=6, use_features=True),
+                        'pubchem_cactvs': PubchemFingerprint(),
+                        'pubchem_fp': PubchemFingerprint(pub_fp='fingerprint')
                         }
 
 # ----------------------------------------------------------------------------------------------------------------------
