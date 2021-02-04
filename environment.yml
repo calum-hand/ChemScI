@@ -1,6 +1,7 @@
 name: ChemScI
 channels:
   - rdkit
+  - tmap
   - bioconda
   - conda-forge
   - defaults
@@ -11,3 +12,5 @@ dependencies:
   - rdkit
   - pyyaml
   - pytest
+  - mhfp
+  - tmap

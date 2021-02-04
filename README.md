@@ -10,8 +10,6 @@ This prevents commonly used tools from being subtly hard-coded into the ChemSci 
 
 Through providing a consistent API, it is hoped that newly developed featurisations for cheminformatics can be readily incorporated and hence provide easy access to the informatics community.
 
-## Design Notes
-* Featurisers and converters are all written using `snake_case` covnention rather than `CamelCase` to reinforce their callable nature.  
 
 ## TODO
 ### Features
