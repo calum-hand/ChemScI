@@ -15,8 +15,8 @@ with open('tests/files/features.pkl', 'rb') as f:
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-smiles = 'O=C1C(=Cc2ccccc2)CCCC1=Cc1ccccc1'
-MOL = MolFromSmiles(smiles)
+SMILES = 'O=C1C(=Cc2ccccc2)CCCC1=Cc1ccccc1'
+MOL = MolFromSmiles(SMILES)
 assert MOL, 'Error creating the testing mol object.'
 
 # ----------------------------------------------------------------------------------------------------------------------
