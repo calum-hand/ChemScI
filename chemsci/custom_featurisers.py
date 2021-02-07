@@ -134,6 +134,10 @@ class Map4Fingerprint:
 class PubchemFingerprint:
     """Featuriser used to interact with generated `pubchempy.Compound` objects and retrieve relevant fingerprint records
     / data.
+
+    Notes
+    -----
+    Can only be used in combination with converter `chemsci.converters.pubchem_conv`.
     """
     valid_fingerprints = ['cactvs_fingerprint', 'fingerprint']
 
