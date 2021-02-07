@@ -48,8 +48,6 @@ class FeatureFactory(TransformerMixin):
                 * `fcfp_6_1024` (1024 bit ECFP of radius 4)
                 * `fcfp_4_2048` (1024 bit ECFP of radius 4)
                 * `fcfp_6_2048` (1024 bit ECFP of radius 4)
-                * `pubchem_cactvs` (Presence of 881 substructures from PubChem API)
-                * `pubchem_fp` (Encoded fingerpint from PubChem API)
         """
         self.converter = determine_default_or_callable(converter, _DEFAULT_CONVERTERS)
         self.featuriser = determine_default_or_callable(featuriser, _DEAFULT_FEATURISERS)

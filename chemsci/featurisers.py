@@ -5,8 +5,6 @@ from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
 from rdkit.Chem.rdmolops import RDKFingerprint
 from rdkit.Avalon.pyAvalonTools import GetAvalonFP
 
-from chemsci.exceptions import UserSelectionError
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -170,47 +168,6 @@ class MorganFingerprint:
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class PubchemFingerprint:
-    """Featuriser used to interact with generated `pubchempy.Compound` objects and retrieve relevant fingerprint records
-    / data.
-    """
-    valid_fingerprints = ['cactvs_fingerprint', 'fingerprint']
-
-    def __init__(self, pub_fp='cactv_fingerprint'):
-        """
-        Parameters
-        ----------
-        pub_fp : str
-            The specific PubChem fingerprint to be retrieved from the pubchempy.Compound object.
-            Can either be 'cactvs_fingerprint' OR 'fingerprint'.
-        """
-        self.pub_fp = str(pub_fp).lower()
-
-        if self.pub_fp not in self.valid_fingerprints:
-            raise UserSelectionError(F'Passed {self.pub_fp} not in {self.valid_fingerprints}.')
-
-    def __call__(self, mol):
-        """Retrieves the specified PubChem fingerprint for passed `mol` object.
-
-        Parameters
-        ----------
-        mol : pubchempy.Compound
-            PubChempy Compound object.
-
-        Returns
-        -------
-        fp_arr : np.ndarray, shape(self.nbits, )
-            Fingerprint expressed as a numpy row vector.
-        """
-        if self.pub_fp == self.valid_fingerprints[0]:
-            fp_bit = mol.cactvs_fingerprint  # attribute for Compound object in `PubchemPy`
-        elif self.pub_fp == self.valid_fingerprints[1]:
-            fp_bit = mol.fingerprint
-        else:
-            raise AttributeError(F'Incorrect fingerprint specified. {self.pub_fp} not supported by PubChemPy API.')
-        fp_arr = np.array(list(fp_bit))
-        return fp_arr
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -224,9 +181,7 @@ _DEAFULT_FEATURISERS = {'maccs': maccs_fp,
                         'fcfp_4_1024': MorganFingerprint(nbits=1024, diameter=4, use_features=True),
                         'fcfp_6_1024': MorganFingerprint(nbits=1024, diameter=6, use_features=True),
                         'fcfp_4_2048': MorganFingerprint(nbits=2048, diameter=4, use_features=True),
-                        'fcfp_6_2048': MorganFingerprint(nbits=2048, diameter=6, use_features=True),
-                        'pubchem_cactvs': PubchemFingerprint(),
-                        'pubchem_fp': PubchemFingerprint(pub_fp='fingerprint')
+                        'fcfp_6_2048': MorganFingerprint(nbits=2048, diameter=6, use_features=True)
                         }
 
 # ----------------------------------------------------------------------------------------------------------------------
