@@ -5,6 +5,7 @@ import yaml
 import numpy as np
 import pandas as pd
 from sklearn.base import TransformerMixin
+from tqdm import tqdm
 
 from chemsci.converters import _DEFAULT_CONVERTERS
 from chemsci.featurisers import _DEAFULT_FEATURISERS
@@ -119,7 +120,7 @@ class FeatureFactory(TransformerMixin):
             List of molecular featurisations in the form of numpy arrays.
         """
         features = []
-        for representation in X:
+        for representation in tqdm(X):
             mol = self.convert_rep(representation)
             feat = self.featurise_mol(mol)
             features.append(feat)
