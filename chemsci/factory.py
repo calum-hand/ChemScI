@@ -103,7 +103,7 @@ class FeatureFactory(TransformerMixin):
             feat = np.array([])
         return feat
 
-    def tranform(self, X):
+    def transform(self, X):
         """Apply featurisation to passed iterable of molecular representations.
 
         Parameters
@@ -325,7 +325,7 @@ class FeatureFactory(TransformerMixin):
 
     def fit(self, X, y=None):
         """Included for conformity with sklearn API, otherwise is not used and does not return anything."""
-        pass
+        return self
 
     def __len__(self):
         """Number of featurisations.
