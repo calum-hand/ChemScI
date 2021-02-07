@@ -137,7 +137,7 @@ class PubchemFingerprint:
     """
     valid_fingerprints = ['cactvs_fingerprint', 'fingerprint']
 
-    def __init__(self, pub_fp='cactv_fingerprint'):
+    def __init__(self, pub_fp='cactvs_fingerprint'):
         """
         Parameters
         ----------
