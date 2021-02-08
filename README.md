@@ -28,6 +28,7 @@ X = ['smiles_1', 'smiles_2', 'smiles_n']
 out = ff.fit_transform(X)
 ```
 
+
 ### Default converters and featurisers
 Default `converter`s:
 * smiles
@@ -66,7 +67,7 @@ ff = FeatureFactory(converter='smiles', featuriser=Map4Fingerprint())
 The contracts of the callables are as below where any type can be used as input but the output of `featuriser` must be a numpy array.
 
 ```python
-def converter(representation):
+def convert(representation):
     """
     Parameters
     ----------
@@ -78,10 +79,10 @@ def converter(representation):
     out : any
     """
     out = custom_conversion(representation)
-    out
+    return out
 
 
-def featuriser(mol):
+def featurise(mol):
     """
     Parameters
     ----------
@@ -93,8 +94,19 @@ def featuriser(mol):
     out : np.ndarray
     """
     out = custom_featuisation(representation)
-    out
+    return out
+```
+If more custom and detailed logic is required (as in MAP4) then a class specifying the `__call__` method can be passed instead so long as it is instantiated.
+The below gives an example of an arbitrary class where we wish to weight the generated value with a custom value we specified at initialisation.
 
+```python
+class Demo:
+    def __init__(self, custom_param=1):
+        self.custom_param = int(custom_param)
+    
+    def __call__(self, *args, **kwargs):
+        out = custom_func(*args, **kwargs)
+        return out + self.custom_param
 ```
 
 ### Integration with `sklearn`
