@@ -100,13 +100,17 @@ If more custom and detailed logic is required (as in MAP4) then a class specifyi
 The below gives an example of an arbitrary class where we wish to weight the generated value with a custom value we specified at initialisation.
 
 ```python
-class Demo:
+from chemsci.factory import FeatureFactory
+
+class CustomFeaturiser:
     def __init__(self, custom_param=1):
         self.custom_param = int(custom_param)
     
     def __call__(self, *args, **kwargs):
         out = custom_func(*args, **kwargs)
         return out + self.custom_param
+        
+ff = FeatureFactory(converter='smiles', featuriser=CustomFeaturiser(3))
 ```
 
 ### Integration with `sklearn`
