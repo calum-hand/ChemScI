@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 import warnings
 import json
 
@@ -5,7 +6,6 @@ import yaml
 import numpy as np
 import pandas as pd
 from sklearn.base import TransformerMixin
-from tqdm import tqdm
 
 from chemsci.converters import _DEFAULT_CONVERTERS
 from chemsci.featurisers import _DEAFULT_FEATURISERS
@@ -19,7 +19,7 @@ class FeatureFactory(TransformerMixin):
     format for use in machine learning and other informatics analysis.
     """
 
-    def __init__(self, converter, featuriser):
+    def __init__(self, converter, featuriser, n_threads=1):
         """
         Parameters
         ----------
@@ -48,10 +48,18 @@ class FeatureFactory(TransformerMixin):
                 * `fcfp_6_1024` (1024 bit ECFP of radius 6)
                 * `fcfp_4_2048` (2048 bit ECFP of radius 4)
                 * `fcfp_6_2048` (2048 bit ECFP of radius 6)
+
+        n_threads : int
+            Number of threads to use when performing feature transformations.
+            Must be a positive integer number.
         """
         self.converter = determine_default_or_callable(converter, _DEFAULT_CONVERTERS)
         self.featuriser = determine_default_or_callable(featuriser, _DEAFULT_FEATURISERS)
+        self.n_threads = abs(int(n_threads))
         self.data = []
+
+        if self.n_threads == 0:
+            raise ValueError(F'Number of threads must be positive integer value, not {self.n_threads}'.)
 
     def convert_rep(self, representation):
         """Convert molecular representation into workable molecular object which can be featurised.
@@ -117,13 +125,15 @@ class FeatureFactory(TransformerMixin):
         features : list[np.ndarray]
             List of molecular featurisations in the form of numpy arrays.
         """
-        features = []
-        for representation in tqdm(X):
+        def _threaded_conversion(representation):
+            # conversion of representation to feature.
             mol = self.convert_rep(representation)
             feat = self.featurise_mol(mol)
-            features.append(feat)
+            return feat
 
-        self.data = features
+        with ThreadPoolExecutor(max_workers=self.n_threads) as executor:
+            self.data = list(executor.map(_threaded_conversion, X))
+
         return self.data
 
     def to_list(self):
