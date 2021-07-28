@@ -59,7 +59,9 @@ class FeatureFactory(TransformerMixin):
         self.data = []
 
         if self.n_threads == 0:
-            raise ValueError(F'Number of threads must be positive integer value, not {self.n_threads}'.)
+            raise ValueError(F'Number of threads must be positive integer value, not {self.n_threads}.')
+
+        assert self.n_threads != 0, 'Number of threads specified must be positive integer value.'
 
     def convert_rep(self, representation):
         """Convert molecular representation into workable molecular object which can be featurised.
